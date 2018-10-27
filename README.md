@@ -10,13 +10,57 @@ Support is available on [the forums](http://forum.aegisub.org) or [on IRC](irc:/
 
 ### Linux
 
-
+**Release install**
 Prerequisites:
 
 1. Install dependencies:
 
 ```
 sudo apt install libx11-dev libgl1-mesa-dev pkg-config libfreetype6-dev libfontconfig1-dev libass-dev libboost-all-dev libffms2-dev
+```
+
+2. Install LUA:
+
+```
+sudo apt install ...
+```
+
+Building:
+
+1. Download and untar the release: https://github.com/aniolm9/Aegisub/archive/v3.2.2-1.tar.gz
+2. Build, compile and install:
+
+```
+./configure
+make
+sudo make install
+```
+
+**Source install**
+Prerequisites:
+
+1. Install dependencies:
+
+```
+sudo apt install libx11-dev libgl1-mesa-dev pkg-config libfreetype6-dev libfontconfig1-dev libass-dev libboost-all-dev libffms2-dev intltool intltool-debian autoconf autogen libtool
+```
+
+2. Install LUA:
+
+```
+sudo apt install ...
+```
+
+Building:
+
+1. Clone the git repository (about 2.5GB): `git clone --recursive https://github.com/aniolm9/Aegisub.git`
+2. Build, compile and install:
+
+```
+./autogen.sh
+./configure
+make
+sudo make install
 ```
 
 ### Windows
