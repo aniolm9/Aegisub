@@ -10,7 +10,7 @@ Support is available on [the forums](http://forum.aegisub.org) or [on IRC](irc:/
 
 ### Linux
 
-**Release install**
+**Release install**  
 Prerequisites:
 
 1. Install dependencies:
@@ -36,7 +36,7 @@ make
 sudo make install
 ```
 
-**Source install**
+**Source install**  
 Prerequisites:
 
 1. Install dependencies:
