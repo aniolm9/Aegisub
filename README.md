@@ -22,7 +22,7 @@ sudo apt install libx11-dev libgl1-mesa-dev pkg-config libfreetype6-dev libfontc
 2. Install LUA:
 
 ```
-sudo apt install ...
+sudo apt install luajit libluajit* liblua5.*-dev liblua50-dev lua5.1 lua5.2 lua5.3 lua50
 ```
 
 Building:
@@ -48,7 +48,7 @@ sudo apt install libx11-dev libgl1-mesa-dev pkg-config libfreetype6-dev libfontc
 2. Install LUA:
 
 ```
-sudo apt install ...
+sudo apt install luajit libluajit* liblua5.*-dev liblua50-dev lua5.1 lua5.2 lua5.3 lua50
 ```
 
 Building:
