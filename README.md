@@ -8,6 +8,17 @@ Support is available on [the forums](http://forum.aegisub.org) or [on IRC](irc:/
 
 ## Building Aegisub
 
+### Linux
+
+
+Prerequisites:
+
+1. Install dependencies:
+
+```
+sudo apt install libx11-dev libgl1-mesa-dev pkg-config libfreetype6-dev libfontconfig1-dev libass-dev libboost-all-dev libffms2-dev
+```
+
 ### Windows
 
 Prerequisites:
