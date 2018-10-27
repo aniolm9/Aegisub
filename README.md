@@ -27,7 +27,7 @@ sudo apt install ...
 
 Building:
 
-1. Download and untar the release: https://github.com/aniolm9/Aegisub/archive/v3.2.2-1.tar.gz
+1. Download and untar the release: https://github.com/aniolm9/Aegisub/releases/download/v3.2.2-1/aegisub-3.2.2-1.tar.gz
 2. Build, compile and install:
 
 ```
