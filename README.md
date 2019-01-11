@@ -16,7 +16,7 @@ Prerequisites:
 1. Install dependencies:
 
 ```
-sudo apt install libx11-dev libgl1-mesa-dev pkg-config libfreetype6-dev libfontconfig1-dev libass-dev libboost-dev libboost-filesystem-dev libboost-chrono-dev libffms2-dev libwxgtk3.0-dev
+sudo apt install libx11-dev libgl1-mesa-dev pkg-config libfreetype6-dev libfontconfig1-dev libass-dev libboost-dev libboost-filesystem-dev libboost-chrono-dev libboost-regex-dev libffms2-dev libwxgtk3.0-dev
 ```
 
 2. Install LUA:
@@ -42,7 +42,7 @@ Prerequisites:
 1. Install dependencies:
 
 ```
-sudo apt install libx11-dev libgl1-mesa-dev pkg-config libfreetype6-dev libfontconfig1-dev libass-dev libboost-dev libboost-filesystem-dev libboost-chrono-dev libffms2-dev libwxgtk3.0-dev intltool intltool-debian autoconf autogen libtool
+sudo apt install libx11-dev libgl1-mesa-dev pkg-config libfreetype6-dev libfontconfig1-dev libass-dev libboost-dev libboost-filesystem-dev libboost-chrono-dev libboost-regex-dev libffms2-dev libwxgtk3.0-dev intltool intltool-debian autoconf autogen libtool
 ```
 
 2. Install LUA:
