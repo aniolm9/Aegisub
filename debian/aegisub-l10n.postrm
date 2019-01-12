@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+#DEBHELPER#
+
+dpkg-maintscript-helper symlink_to_dir \
+	/usr/share/doc/aegisub-l10n aegisub 3.2.2+dfsg-2 aegisub-l10n -- "$@"

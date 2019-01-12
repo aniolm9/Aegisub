@@ -1,0 +1,16 @@
+remove-vendor-luajit-dependency.patch
+fix-pthread.patch
+only-add-timestamp-in-build-credit.patch
+add-libatomic-dependency.patch
+luajit_21.patch
+sort-automation-menus.patch
+osx-menu.patch
+fix-mru-menus.patch
+delete-multimap-cache-cleaner.patch
+add-missing-static.patch
+delete-implicit-conversions.patch
+allow-unicode-text.patch
+fix-icu-compilation.patch
+add-icu-prefix.patch
+simplify-version.patch
+add-keywords-desktop.patch

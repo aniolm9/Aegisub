@@ -1,0 +1,62 @@
+#!/usr/bin/make -f
+DEB_DEBIAN_DIR=$(dir $(firstword $(MAKEFILE_LIST)))
+DEB_UPSTREAM_VERSION=$(shell dpkg-parsechangelog | sed -rne 's,^Version: ([0-9]:)*([^-]+).*,\2,p')
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_LDFLAGS_MAINT_APPEND := -Wl,--as-needed
+
+%:
+	dh $@ --with autoreconf
+
+override_dh_installdocs:
+	dh_installdocs -i
+	dh_installdocs --remaining --link-doc=aegisub
+
+override_dh_auto_configure:
+	dh_auto_configure -- --with-boost-libdir=/usr/lib/${DEB_HOST_MULTIARCH}
+
+override_dh_auto_install:
+	dh_auto_install
+	find debian/tmp/usr/share -type f -exec chmod a-x '{}' ';'
+
+override_dh_auto_clean:
+	cp build/git_version.h debian/git_version.h.backup
+	cp build/version.sh debian/version.sh.backup
+	-dh_auto_clean
+	mv debian/git_version.h.backup build/git_version.h
+	mv debian/version.sh.backup build/version.sh
+	rm -f src/libresrc/default_config_platform.json
+
+override_dh_autoreconf:
+	dh_autoreconf --as-needed
+
+override_dh_auto_test:
+	# skip test
+
+get-orig-source:
+	# download tarball
+	uscan --noconf --force-download --download-current-version --destdir=. $(DEB_DEBIAN_DIR)/..
+	# extract tarball
+	tar -xf aegisub_$(DEB_UPSTREAM_VERSION).orig.tar.xz
+	rm aegisub-$(DEB_UPSTREAM_VERSION).tar.xz
+	rm aegisub_$(DEB_UPSTREAM_VERSION).orig.tar.xz
+	# remove some directories
+	rm -rf aegisub-$(DEB_UPSTREAM_VERSION)/vendor/boost
+	rm -rf aegisub-$(DEB_UPSTREAM_VERSION)/vendor/csri
+	rm -rf aegisub-$(DEB_UPSTREAM_VERSION)/vendor/ffmpeg
+	rm -rf aegisub-$(DEB_UPSTREAM_VERSION)/vendor/ffms2
+	rm -rf aegisub-$(DEB_UPSTREAM_VERSION)/vendor/fftw
+	rm -rf aegisub-$(DEB_UPSTREAM_VERSION)/vendor/fontconfig
+	rm -rf aegisub-$(DEB_UPSTREAM_VERSION)/vendor/freetype2
+	rm -rf aegisub-$(DEB_UPSTREAM_VERSION)/vendor/googletest
+	rm -rf aegisub-$(DEB_UPSTREAM_VERSION)/vendor/hunspell
+	rm -rf aegisub-$(DEB_UPSTREAM_VERSION)/vendor/iconv
+	rm -rf aegisub-$(DEB_UPSTREAM_VERSION)/vendor/icu
+	rm -rf aegisub-$(DEB_UPSTREAM_VERSION)/vendor/libass
+	rm -rf aegisub-$(DEB_UPSTREAM_VERSION)/vendor/luajit
+	rm -rf aegisub-$(DEB_UPSTREAM_VERSION)/vendor/wxWidgets
+	# create new tarball
+	GZIP=--best tar -cJ --owner root --group root --mode a+rX -f \
+		aegisub_$(DEB_UPSTREAM_VERSION)+dfsg.orig.tar.xz \
+		aegisub-$(DEB_UPSTREAM_VERSION)
+	rm -rf aegisub-$(DEB_UPSTREAM_VERSION)

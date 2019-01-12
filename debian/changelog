@@ -1,0 +1,87 @@
+aegisub (3.2.2+dfsg-4) unstable; urgency=medium
+
+  [ Gunnar Wolf ]
+  * Incorporate upstream patch to fix FTBFS. The patch itself (linked from
+    the bug report) comes from
+    https://build.opensuse.org/package/view_file/multimedia:apps/aegisub/luabins.patch?expand=1
+
+  * Updated Vcs-* fields to point to Salsa instead of Alioth
+
+  [ Ondřej Nový ]
+  * d/copyright: Use https protocol in Format field
+  * d/control: Deprecating priority extra as per policy 4.0.1
+  * d/control: Set Vcs-* to salsa.debian.org
+
+  [ Aniol Marti ]
+  * Add patches to fix bug in Buster and Sid (Closes: #873327, #903580)
+  * Update Debian Standards Version to 4.2.1
+  * Update Aegisub version to 3.2.2 in debian/manpages
+  * Remove debian/menu
+  * Set aegisub-dbg priority to optional
+  * New maintainer (Closes: #915363)
+
+ -- Aniol Marti <amarti@caliu.cat>  Thu, 20 Dec 2018 16:40:35 +0100
+
+aegisub (3.2.2+dfsg-3) unstable; urgency=medium
+
+  * replace aegisub-l10n's doc symlink with actual directory to
+    support binNMUs (Closes: #799316).
+
+ -- Sebastian Reichel <sre@debian.org>  Sat, 19 Sep 2015 00:30:12 +0200
+
+aegisub (3.2.2+dfsg-2) unstable; urgency=medium
+
+  * Fix FTBFS on mips* and ppc by linking against -latomic
+
+ -- Sebastian Reichel <sre@debian.org>  Mon, 10 Aug 2015 02:54:36 +0200
+
+aegisub (3.2.2+dfsg-1) unstable; urgency=low
+
+  [ Pascal De Vuyst ]
+  * Fix Typo in package description (Closes: #739219)
+
+  [ Juan Picca ]
+  * Add patch to fix reproducible build (Closes: #789728)
+
+  [ Sebastian Reichel ]
+  * New upstream release
+   - remove vendor directory from orig tarball
+  * Update Debian Standards Version to 3.9.6
+
+ -- Sebastian Reichel <sre@debian.org>  Tue, 04 Aug 2015 21:40:50 +0200
+
+aegisub (3.1.2-1) unstable; urgency=low
+
+  * New upstream release
+  * Import updated watch file from Bart Martens
+  * Bump ffms2 build dependency to 2.19 to fix audio problems and
+    have correct binary dependencies (Closes: #731143, #730416)
+  * Remove patches, which were imported from upstream git
+
+ -- Sebastian Reichel <sre@debian.org>  Thu, 13 Feb 2014 02:58:17 +0100
+
+aegisub (3.0.4-2) unstable; urgency=low
+
+  * Cherry-pick new upstream patch, which fixes the menu bar
+  * Use canonical Vcs URLs
+
+ -- Sebastian Reichel <sre@debian.org>  Fri, 22 Nov 2013 13:08:28 +0100
+
+aegisub (3.0.4-1) unstable; urgency=low
+
+  * New upstream release (Closes: #691384, #713679, #721189)
+  * Use dh-autoreconf (Closes: #727313)
+  * Update patches
+  * Add new patch for wxWidgets 3.0 support
+  * Update Debian Standards Version: 3.9.3 -> 3.9.5
+  * Update Compat level: 8 -> 9
+  * Build -dbg package
+  * Update manpage
+
+ -- Sebastian Reichel <sre@debian.org>  Thu, 14 Nov 2013 16:49:59 +0000
+
+aegisub (2.1.9-1) unstable; urgency=low
+
+  * Initial Debian release (Closes: #580594)
+
+ -- Sebastian Reichel <sre@debian.org>  Fri, 16 Mar 2012 22:58:00 +0100

@@ -1,0 +1,71 @@
+Source: aegisub
+Section: video
+Priority: optional
+Maintainer: Aniol Marti <amarti@caliu.cat>
+Build-Depends: debhelper (>= 10),
+               libx11-dev,
+               libgl1-mesa-dev | libgl-dev,
+               pkg-config,
+               libfreetype6-dev,
+               libfontconfig1-dev,
+               libass-dev,
+               libboost-dev,
+               libboost-chrono-dev,
+               libboost-filesystem-dev,
+               libboost-locale-dev,
+               libboost-regex-dev,
+               libboost-system-dev,
+               libboost-thread-dev,
+               libffms2-dev,
+               libwxgtk3.0-dev,
+               intltool,
+               intltool-debian,
+               luajit,
+               lua5.1,
+               libluajit-5.1-2,
+               libluajit-5.1-common,
+               libluajit-5.1-dev,
+               liblua5.1-0-dev,
+               libasound2-dev
+Standards-Version: 4.2.1
+Homepage: http://www.aegisub.org/
+Vcs-Git: https://salsa.debian.org/debian/aegisub.git
+Vcs-Browser: https://salsa.debian.org/debian/aegisub
+
+
+Package: aegisub
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
+Suggests: aegisub-l10n
+Description: advanced subtitle editor
+ Originally created as tool to make typesetting, particularly in anime
+ fansubs, a less painful experience, Aegisub has grown into a fully
+ fledged, highly customizable subtitle editor.
+ .
+ It features a lot of convenient tools to help you with timing, typesetting,
+ editing and translating subtitles, as well as a powerful scripting environment
+ called Automation (originally mostly intended for creating karaoke effects,
+ Automation can now be used much else, including creating macros and various
+ other convenient tools).
+
+Package: aegisub-l10n
+Section: localization
+Architecture: all
+Depends: ${misc:Depends},
+         aegisub (>= ${source:Version}),
+         aegisub (<< ${source:Version}.1~)
+Description: aegisub language packages
+ Originally created as tool to make typesetting, particularly in anime
+ fansubs, a less painful experience, Aegisub has grown into a fully
+ fledged, highly customizable subtitle editor.
+ .
+ It features a lot of convenient tools to help you with timing, typesetting,
+ editing and translating subtitles, as well as a powerful scripting environment
+ called Automation (originally mostly intended for creating karaoke effects,
+ Automation can now be used much else, including creating macros and various
+ other convenient tools).
+ .
+ This package contains language packages for the following languages:
+ ca, cs, da, de, el, es, fa, fi, fr, hu, id, it, ja, ko, pl, pt_BR, pt_PT, ru,
+ sr_RS, vi, zh_CN, zh_TW

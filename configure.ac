@@ -45,12 +45,12 @@ AC_SUBST(build_darwin)
 ########################
 # Name of aegisub binary.
 # This is tagged with the version on release branches.
-AEGISUB_COMMAND="aegisub"
+AEGISUB_COMMAND="aegisub-3.2"
 AC_SUBST(AEGISUB_COMMAND)
 AC_DEFINE_UNQUOTED([AEGISUB_COMMAND], ["${AEGISUB_COMMAND}"], [Name of the Aegisub executable])
 
 # Name of gettext catalog.
-AEGISUB_CATALOG="aegisub"
+AEGISUB_CATALOG="aegisub-3.2"
 AC_SUBST(AEGISUB_CATALOG)
 AC_DEFINE_UNQUOTED([AEGISUB_CATALOG], ["${AEGISUB_CATALOG}"], [Name of the Aegisub gettext catalog])
 

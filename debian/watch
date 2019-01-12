@@ -1,0 +1,4 @@
+version=3
+opts=dversionmangle=s/[+]dfsg//\
+ http://ftp.aegisub.org/pub/releases/ \
+(?:|.*/)aegisub(?:[_\-]v?|)(\d[^\s/]*)\.(?:tar\.xz|txz|tar\.bz2|tbz2|tar\.gz|tgz)
