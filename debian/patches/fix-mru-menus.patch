@@ -1,0 +1,40 @@
+From a4bde47c5cbf33003148db12cd1d94d86cc72a39 Mon Sep 17 00:00:00 2001
+From: Marcin Kurczewski <rr-@sakuya.pl>
+Date: Mon, 28 May 2018 21:24:23 +0200
+Subject: [PATCH] Fix MRU menus (#48)
+
+Broken in 9bbfdddde046c151b4ebaa06de10b2d51216cbec. I don't understand
+why the author made such a change, so I left their solution with #ifdef
+guard.
+---
+ src/menu.cpp | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/menu.cpp b/src/menu.cpp
+index 13e054baa..99edbcf7d 100644
+--- a/src/menu.cpp
++++ b/src/menu.cpp
+@@ -419,7 +419,7 @@ class AutomationMenu final : public wxMenu {
+ 		WorkItem *FindOrMakeSubitem(std::string const &name) {
+ 			auto sub = std::find_if(subitems.begin(), subitems.end(), [&](WorkItem const &item) { return item.displayname == name; });
+ 			if (sub != subitems.end()) return &*sub;
+-			
++
+ 			subitems.emplace_back(name);
+ 			return &subitems.back();
+ 		}
+@@ -529,8 +529,13 @@ namespace menu {
+ 			}
+ 		}
+ 
++#ifdef __WXMAC__
+ 		menu->Bind(wxEVT_MENU_OPEN, &CommandManager::OnMenuOpen, &menu->cm);
+ 		menu->Bind(wxEVT_MENU, &CommandManager::OnMenuClick, &menu->cm);
++#else
++		window->Bind(wxEVT_MENU_OPEN, &CommandManager::OnMenuOpen, &menu->cm);
++		window->Bind(wxEVT_MENU, &CommandManager::OnMenuClick, &menu->cm);
++#endif
+ 
+ #ifdef __WXMAC__
+ 		bind_events(menu.get());
+

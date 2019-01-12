@@ -1,0 +1,316 @@
+From ef4424f5e23e63bd1e138ba14787cd1b95bd0df5 Mon Sep 17 00:00:00 2001
+From: Thomas Goyne <plorkyeran@aegisub.org>
+Date: Wed, 31 Dec 2014 19:41:56 -0800
+Subject: [PATCH] Eliminate implicit std::string <-> wxString conversions
+
+On Windows these don't use UTF-8 and so are broken.
+---
+ src/aegisublocale.cpp        | 5 +++--
+ src/auto4_lua_dialog.cpp     | 4 ++--
+ src/command/app.cpp          | 6 +++---
+ src/command/audio.cpp        | 5 +++--
+ src/command/keyframe.cpp     | 5 ++++-
+ src/command/timecode.cpp     | 4 ++--
+ src/command/video.cpp        | 4 ++--
+ src/dialog_attachments.cpp   | 2 +-
+ src/dialog_automation.cpp    | 2 +-
+ src/dialog_export.cpp        | 2 +-
+ src/dialog_properties.cpp    | 2 +-
+ src/dialog_style_manager.cpp | 2 +-
+ src/ffmpegsource_common.cpp  | 2 +-
+ src/main.cpp                 | 2 +-
+ src/utils.cpp                | 8 ++++----
+ src/utils.h                  | 4 ++--
+ src/validators.cpp           | 4 ++--
+ 17 files changed, 34 insertions(+), 29 deletions(-)
+
+diff --git a/src/aegisublocale.cpp b/src/aegisublocale.cpp
+index 3717edba2..de8df7296 100644
+--- a/src/aegisublocale.cpp
++++ b/src/aegisublocale.cpp
+@@ -112,8 +112,9 @@ std::string AegisubLocale::PickLanguage() {
+ 			style);
+ 	if (dialog.ShowModal() == wxID_OK) {
+ 		int picked = dialog.GetSelection();
+-		if (langs[picked] != active_language)
+-			return from_wx(langs[picked]);
++		auto new_lang = from_wx(langs[picked]);
++		if (new_lang != active_language)
++			return new_lang;
+ 	}
+ 
+ 	return "";
+diff --git a/src/auto4_lua_dialog.cpp b/src/auto4_lua_dialog.cpp
+index 5dc5cfb76..a8c7fe418 100644
+--- a/src/auto4_lua_dialog.cpp
++++ b/src/auto4_lua_dialog.cpp
+@@ -461,8 +461,8 @@ namespace Automation4 {
+ 		auto dialog = static_cast<wxDialog *>(parent);
+ 		auto bs = new wxStdDialogButtonSizer;
+ 
+-		auto make_button = [&](wxWindowID id, int button_pushed, wxString const& text) -> wxButton *{
+-			auto button = new wxButton(window, id, text);
++		auto make_button = [&](wxWindowID id, int button_pushed, std::string const& text) -> wxButton *{
++			auto button = new wxButton(window, id, to_wx(text));
+ 			button->Bind(wxEVT_BUTTON, [=](wxCommandEvent &evt) {
+ 				this->button_pushed = button_pushed;
+ 				dialog->TransferDataFromWindow();
+diff --git a/src/command/app.cpp b/src/command/app.cpp
+index 61467f610..cdd797495 100644
+--- a/src/command/app.cpp
++++ b/src/command/app.cpp
+@@ -159,10 +159,10 @@ struct app_language final : public Command {
+ 
+ 	void operator()(agi::Context *c) override {
+ 		// Get language
+-		wxString new_language = wxGetApp().locale.PickLanguage();
+-		if (!new_language) return;
++		auto new_language = wxGetApp().locale.PickLanguage();
++		if (new_language.empty()) return;
+ 
+-		OPT_SET("App/Language")->SetString(from_wx(new_language));
++		OPT_SET("App/Language")->SetString(new_language);
+ 
+ 		// Ask to restart program
+ 		int result = wxMessageBox("Aegisub needs to be restarted so that the new language can be applied. Restart now?", "Restart Aegisub?", wxYES_NO | wxICON_QUESTION |  wxCENTER);
+diff --git a/src/command/audio.cpp b/src/command/audio.cpp
+index b03a24599..a6f700bac 100644
+--- a/src/command/audio.cpp
++++ b/src/command/audio.cpp
+@@ -37,6 +37,7 @@
+ #include "../audio_controller.h"
+ #include "../audio_karaoke.h"
+ #include "../audio_timing.h"
++#include "../compat.h"
+ #include "../include/aegisub/context.h"
+ #include "../libresrc/libresrc.h"
+ #include "../options.h"
+@@ -79,9 +80,9 @@ struct audio_open final : public Command {
+ 	STR_HELP("Open an audio file")
+ 
+ 	void operator()(agi::Context *c) override {
+-		wxString str = _("Audio Formats") + " (*.aac,*.ac3,*.ape,*.dts,*.flac,*.m4a,*.mka,*.mp3,*.mp4,*.ogg,*.w64,*.wav,*.wma)|*.aac;*.ac3;*.ape;*.dts;*.flac;*.m4a;*.mka;*.mp3;*.mp4;*.ogg;*.w64;*.wav;*.wma|"
++		auto str = from_wx(_("Audio Formats") + " (*.aac,*.ac3,*.ape,*.dts,*.flac,*.m4a,*.mka,*.mp3,*.mp4,*.ogg,*.w64,*.wav,*.wma)|*.aac;*.ac3;*.ape;*.dts;*.flac;*.m4a;*.mka;*.mp3;*.mp4;*.ogg;*.w64;*.wav;*.wma|"
+ 					+ _("Video Formats") + " (*.asf,*.avi,*.avs,*.d2v,*.m2ts,*.m4v,*.mkv,*.mov,*.mp4,*.mpeg,*.mpg,*.ogm,*.webm,*.wmv,*.ts)|*.asf;*.avi;*.avs;*.d2v;*.m2ts;*.m4v;*.mkv;*.mov;*.mp4;*.mpeg;*.mpg;*.ogm;*.webm;*.wmv;*.ts|"
+-					+ _("All Files") + " (*.*)|*.*";
++					+ _("All Files") + " (*.*)|*.*");
+ 		auto filename = OpenFileSelector(_("Open Audio File"), "Path/Last/Audio", "", "", str, c->parent);
+ 		if (!filename.empty())
+ 			c->project->LoadAudio(filename);
+diff --git a/src/command/keyframe.cpp b/src/command/keyframe.cpp
+index c1c16f6a1..29e173970 100644
+--- a/src/command/keyframe.cpp
++++ b/src/command/keyframe.cpp
+@@ -31,6 +31,7 @@
+ 
+ #include "command.h"
+ 
++#include "../compat.h"
+ #include "../include/aegisub/context.h"
+ #include "../libresrc/libresrc.h"
+ #include "../options.h"
+@@ -71,7 +72,9 @@ struct keyframe_open final : public Command {
+ 		auto filename = OpenFileSelector(
+ 			_("Open keyframes file"),
+ 			"Path/Last/Keyframes", "" ,".txt",
+-			_("All Supported Formats") + " (*.txt, *.pass, *.stats, *.log)|*.txt;*.pass;*.stats;*.log|" + _("All Files") + " (*.*)|*.*",
++			from_wx(_("All Supported Formats") +
++				" (*.txt, *.pass, *.stats, *.log)|*.txt;*.pass;*.stats;*.log|" +
++				_("All Files") + " (*.*)|*.*"),
+ 			c->parent);
+ 
+ 		if (!filename.empty())
+diff --git a/src/command/timecode.cpp b/src/command/timecode.cpp
+index 1a8bcfef1..6f7fb5faa 100644
+--- a/src/command/timecode.cpp
++++ b/src/command/timecode.cpp
+@@ -71,7 +71,7 @@ struct timecode_open final : public Command {
+ 	STR_HELP("Open a VFR timecodes v1 or v2 file")
+ 
+ 	void operator()(agi::Context *c) override {
+-		auto str = _("All Supported Formats") + " (*.txt)|*.txt|" + _("All Files") + " (*.*)|*.*";
++		auto str = from_wx(_("All Supported Formats") + " (*.txt)|*.txt|" + _("All Files") + " (*.*)|*.*");
+ 		auto filename = OpenFileSelector(_("Open Timecodes File"), "Path/Last/Timecodes", "", "", str, c->parent);
+ 		if (!filename.empty())
+ 			c->project->LoadTimecodes(filename);
+@@ -91,7 +91,7 @@ struct timecode_save final : public Command {
+ 	}
+ 
+ 	void operator()(agi::Context *c) override {
+-		auto str = _("All Supported Formats") + " (*.txt)|*.txt|" + _("All Files") + " (*.*)|*.*";
++		auto str = from_wx(_("All Supported Formats") + " (*.txt)|*.txt|" + _("All Files") + " (*.*)|*.*");
+ 		auto filename = SaveFileSelector(_("Save Timecodes File"), "Path/Last/Timecodes", "", "", str, c->parent);
+ 		if (filename.empty()) return;
+ 
+diff --git a/src/command/video.cpp b/src/command/video.cpp
+index a7600176d..ea1a8a026 100644
+--- a/src/command/video.cpp
++++ b/src/command/video.cpp
+@@ -564,8 +564,8 @@ struct video_open final : public Command {
+ 	STR_HELP("Open a video file")
+ 
+ 	void operator()(agi::Context *c) override {
+-		auto str = _("Video Formats") + " (*.asf,*.avi,*.avs,*.d2v,*.m2ts,*.m4v,*.mkv,*.mov,*.mp4,*.mpeg,*.mpg,*.ogm,*.webm,*.wmv,*.ts,*.y4m,*.yuv)|*.asf;*.avi;*.avs;*.d2v;*.m2ts;*.m4v;*.mkv;*.mov;*.mp4;*.mpeg;*.mpg;*.ogm;*.webm;*.wmv;*.ts;*.y4m;*.yuv|"
+-		         + _("All Files") + " (*.*)|*.*";
++		auto str = from_wx(_("Video Formats") + " (*.asf,*.avi,*.avs,*.d2v,*.m2ts,*.m4v,*.mkv,*.mov,*.mp4,*.mpeg,*.mpg,*.ogm,*.webm,*.wmv,*.ts,*.y4m,*.yuv)|*.asf;*.avi;*.avs;*.d2v;*.m2ts;*.m4v;*.mkv;*.mov;*.mp4;*.mpeg;*.mpg;*.ogm;*.webm;*.wmv;*.ts;*.y4m;*.yuv|"
++		         + _("All Files") + " (*.*)|*.*");
+ 		auto filename = OpenFileSelector(_("Open video file"), "Path/Last/Video", "", "", str, c->parent);
+ 		if (!filename.empty())
+ 			c->project->LoadVideo(filename);
+diff --git a/src/dialog_attachments.cpp b/src/dialog_attachments.cpp
+index 706b202d2..38ff53027 100644
+--- a/src/dialog_attachments.cpp
++++ b/src/dialog_attachments.cpp
+@@ -126,7 +126,7 @@ void DialogAttachments::AttachFile(wxFileDialog &diag, wxString const& commit_ms
+ 	diag.GetPaths(paths);
+ 
+ 	for (auto const& fn : paths)
+-		ass->InsertAttachment(agi::fs::path(fn));
++		ass->InsertAttachment(agi::fs::path(fn.wx_str()));
+ 
+ 	ass->Commit(commit_msg, AssFile::COMMIT_ATTACHMENT);
+ 
+diff --git a/src/dialog_automation.cpp b/src/dialog_automation.cpp
+index 840a6868c..dd6b35259 100644
+--- a/src/dialog_automation.cpp
++++ b/src/dialog_automation.cpp
+@@ -231,7 +231,7 @@ void DialogAutomation::OnAdd(wxCommandEvent &)
+ 	diag.GetPaths(fnames);
+ 
+ 	for (auto const& fname : fnames) {
+-		agi::fs::path fnpath(fname);
++		agi::fs::path fnpath(fname.wx_str());
+ 		OPT_SET("Path/Last/Automation")->SetString(fnpath.parent_path().string());
+ 
+ 		if (has_file(local_manager->GetScripts(), fnpath) || has_file(global_manager->GetScripts(), fnpath)) {
+diff --git a/src/dialog_export.cpp b/src/dialog_export.cpp
+index 79f649170..b0d543b10 100644
+--- a/src/dialog_export.cpp
++++ b/src/dialog_export.cpp
+@@ -186,7 +186,7 @@ DialogExport::~DialogExport() {
+ void DialogExport::OnProcess(wxCommandEvent &) {
+ 	if (!d.TransferDataFromWindow()) return;
+ 
+-	auto filename = SaveFileSelector(_("Export subtitles file"), "", "", "", to_wx(SubtitleFormat::GetWildcards(1)), &d);
++	auto filename = SaveFileSelector(_("Export subtitles file"), "", "", "", SubtitleFormat::GetWildcards(1), &d);
+ 	if (filename.empty()) return;
+ 
+ 	for (size_t i = 0; i < filter_list->GetCount(); ++i) {
+diff --git a/src/dialog_properties.cpp b/src/dialog_properties.cpp
+index 7c0399402..501a96f19 100644
+--- a/src/dialog_properties.cpp
++++ b/src/dialog_properties.cpp
+@@ -123,7 +123,7 @@ DialogProperties::DialogProperties(agi::Context *c)
+ 	res_sizer->Add(ResY, 1, wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
+ 	res_sizer->Add(FromVideo, 1, 0, 0);
+ 
+-	YCbCrMatrix = new wxComboBox(&d, -1, c->ass->GetScriptInfo("YCbCr Matrix"),
++	YCbCrMatrix = new wxComboBox(&d, -1, to_wx(c->ass->GetScriptInfo("YCbCr Matrix")),
+ 		 wxDefaultPosition, wxDefaultSize, to_wx(MatrixNames()), wxCB_READONLY);
+ 
+ 	auto matrix_sizer = new wxBoxSizer(wxHORIZONTAL);
+diff --git a/src/dialog_style_manager.cpp b/src/dialog_style_manager.cpp
+index 4a60ac086..5e63537a8 100644
+--- a/src/dialog_style_manager.cpp
++++ b/src/dialog_style_manager.cpp
+@@ -430,7 +430,7 @@ void DialogStyleManager::LoadCatalog() {
+ 	// Get saved style catalogs
+ 	auto catalogs = AssStyleStorage::GetCatalogs();
+ 	for (auto const& c : catalogs)
+-		CatalogList->Append(c);
++		CatalogList->Append(to_wx(c));
+ 
+ 	// Create a default storage if there are none
+ 	if (CatalogList->IsListEmpty()) {
+diff --git a/src/ffmpegsource_common.cpp b/src/ffmpegsource_common.cpp
+index 3549a8df4..5ebb073a2 100644
+--- a/src/ffmpegsource_common.cpp
++++ b/src/ffmpegsource_common.cpp
+@@ -138,7 +138,7 @@ int FFmpegSourceProvider::AskForTrackSelection(const std::map<int, std::string>
+ 	wxArrayString Choices;
+ 
+ 	for (auto const& track : TrackList) {
+-		Choices.Add(agi::format(_("Track %02d: %s"), track.first, to_wx(track.second)));
++		Choices.Add(agi::wxformat(_("Track %02d: %s"), track.first, track.second));
+ 		TrackNumbers.push_back(track.first);
+ 	}
+ 
+diff --git a/src/main.cpp b/src/main.cpp
+index 327b13021..ae17e5711 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -446,5 +446,5 @@ int AegisubApp::OnRun() {
+ 
+ void AegisubApp::MacOpenFile(const wxString &filename) {
+ 	if (frame && !filename.empty())
+-		frame->context->project->LoadSubtitles(agi::fs::path(filename));
++		frame->context->project->LoadSubtitles(agi::fs::path(filename.wx_str()));
+ }
+diff --git a/src/utils.cpp b/src/utils.cpp
+index 3e90caa5b..e5ffe9e75 100644
+--- a/src/utils.cpp
++++ b/src/utils.cpp
+@@ -250,21 +250,21 @@ wxString FontFace(std::string opt_prefix) {
+ 	return to_wx(value);
+ }
+ 
+-static agi::fs::path FileSelector(wxString const& message, std::string const& option_name, std::string const& default_filename, std::string const& default_extension, wxString const& wildcard, int flags, wxWindow *parent) {
++static agi::fs::path FileSelector(wxString const& message, std::string const& option_name, std::string const& default_filename, std::string const& default_extension, std::string const& wildcard, int flags, wxWindow *parent) {
+ 	wxString path;
+ 	if (!option_name.empty())
+ 		path = to_wx(OPT_GET(option_name)->GetString());
+-	agi::fs::path filename = wxFileSelector(message, path, to_wx(default_filename), to_wx(default_extension), wildcard, flags, parent).wx_str();
++	agi::fs::path filename = wxFileSelector(message, path, to_wx(default_filename), to_wx(default_extension), to_wx(wildcard), flags, parent).wx_str();
+ 	if (!filename.empty() && !option_name.empty())
+ 		OPT_SET(option_name)->SetString(filename.parent_path().string());
+ 	return filename;
+ }
+ 
+-agi::fs::path OpenFileSelector(wxString const& message, std::string const& option_name, std::string const& default_filename, std::string const& default_extension, wxString const& wildcard, wxWindow *parent) {
++agi::fs::path OpenFileSelector(wxString const& message, std::string const& option_name, std::string const& default_filename, std::string const& default_extension, std::string const& wildcard, wxWindow *parent) {
+ 	return FileSelector(message, option_name, default_filename, default_extension, wildcard, wxFD_OPEN | wxFD_FILE_MUST_EXIST, parent);
+ }
+ 
+-agi::fs::path SaveFileSelector(wxString const& message, std::string const& option_name, std::string const& default_filename, std::string const& default_extension, wxString const& wildcard, wxWindow *parent) {
++agi::fs::path SaveFileSelector(wxString const& message, std::string const& option_name, std::string const& default_filename, std::string const& default_extension, std::string const& wildcard, wxWindow *parent) {
+ 	return FileSelector(message, option_name, default_filename, default_extension, wildcard, wxFD_SAVE | wxFD_OVERWRITE_PROMPT, parent);
+ }
+ 
+diff --git a/src/utils.h b/src/utils.h
+index f09687ae9..5d9ebe0e2 100644
+--- a/src/utils.h
++++ b/src/utils.h
+@@ -94,8 +94,8 @@ void SetClipboard(wxBitmap const& new_value);
+ 
+ wxString FontFace(std::string opt_prefix);
+ 
+-agi::fs::path OpenFileSelector(wxString const& message, std::string const& option_name, std::string const& default_filename, std::string const& default_extension, wxString const& wildcard, wxWindow *parent);
+-agi::fs::path SaveFileSelector(wxString const& message, std::string const& option_name, std::string const& default_filename, std::string const& default_extension, wxString const& wildcard, wxWindow *parent);
++agi::fs::path OpenFileSelector(wxString const& message, std::string const& option_name, std::string const& default_filename, std::string const& default_extension, std::string const& wildcard, wxWindow *parent);
++agi::fs::path SaveFileSelector(wxString const& message, std::string const& option_name, std::string const& default_filename, std::string const& default_extension, std::string const& wildcard, wxWindow *parent);
+ 
+ wxString LocalizedLanguageName(wxString const& lang);
+ 
+diff --git a/src/validators.cpp b/src/validators.cpp
+index 20b4c596b..163edaa1f 100644
+--- a/src/validators.cpp
++++ b/src/validators.cpp
+@@ -69,7 +69,7 @@ void IntValidator::OnChar(wxKeyEvent& event) {
+ 	auto ctrl = static_cast<wxTextCtrl *>(GetWindow());
+ 	auto str = new_value(ctrl, chr);
+ 	int parsed;
+-	if (allow_negative && str == '-')
++	if (allow_negative && str == "-")
+ 		event.Skip();
+ 	else if (agi::util::try_parse(str, &parsed) && (allow_negative || parsed >= 0))
+ 		event.Skip();
+@@ -121,7 +121,7 @@ void DoubleValidator::OnChar(wxKeyEvent& event) {
+ 
+ 	double parsed;
+ 	bool can_parse = agi::util::try_parse(str, &parsed);
+-	if ((min < 0 && str == '-') || str == '.')
++	if ((min < 0 && str == "-") || str == ".")
+ 		event.Skip();
+ 	else if (can_parse && parsed >= min && parsed <= max)
+ 		event.Skip();
+

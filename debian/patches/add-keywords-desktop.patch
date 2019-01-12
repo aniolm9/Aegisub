@@ -1,0 +1,16 @@
+Subject: Add Keywords field to .desktop file
+Author: Aniol Marti <amarti@caliu.cat>
+Forwarded: not-needed
+Last-Update: 2018-12-09
+Index: aegisub/packages/desktop/aegisub.desktop.template.in
+===================================================================
+--- aegisub.orig/packages/desktop/aegisub.desktop.template.in
++++ aegisub/packages/desktop/aegisub.desktop.template.in
+@@ -4,6 +4,7 @@ Type=Application
+ _Name=Aegisub
+ _GenericName=Subtitle Editor
+ _Comment=Create and edit subtitles for film and videos.
++_Keywords=subtitles;video;audio;text
+ Exec=@AEGISUB_COMMAND@ %f
+ TryExec=@AEGISUB_COMMAND@
+ Icon=aegisub

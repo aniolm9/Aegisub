@@ -1,0 +1,23 @@
+From 1d82a755950318c36139101a6a7cd90b2537e652 Mon Sep 17 00:00:00 2001
+From: Thomas Goyne <plorkyeran@aegisub.org>
+Date: Tue, 30 Dec 2014 14:53:06 -0800
+Subject: [PATCH] Add a missing static
+
+---
+ src/utils.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/utils.cpp b/src/utils.cpp
+index 518504ad8..3e90caa5b 100644
+--- a/src/utils.cpp
++++ b/src/utils.cpp
+@@ -250,7 +250,7 @@ wxString FontFace(std::string opt_prefix) {
+ 	return to_wx(value);
+ }
+ 
+-agi::fs::path FileSelector(wxString const& message, std::string const& option_name, std::string const& default_filename, std::string const& default_extension, wxString const& wildcard, int flags, wxWindow *parent) {
++static agi::fs::path FileSelector(wxString const& message, std::string const& option_name, std::string const& default_filename, std::string const& default_extension, wxString const& wildcard, int flags, wxWindow *parent) {
+ 	wxString path;
+ 	if (!option_name.empty())
+ 		path = to_wx(OPT_GET(option_name)->GetString());
+

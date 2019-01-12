@@ -1,0 +1,39 @@
+From 77ecff1cbad036b2234c9de2fc78e572e6fdda66 Mon Sep 17 00:00:00 2001
+From: Thomas Goyne <plorkyeran@aegisub.org>
+Date: Thu, 17 Jul 2014 15:46:27 -0700
+Subject: [PATCH] Eliminate a pointless multimap in the cache cleaner
+
+---
+ src/utils.cpp | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/src/utils.cpp b/src/utils.cpp
+index 29067a020..518504ad8 100644
+--- a/src/utils.cpp
++++ b/src/utils.cpp
+@@ -165,10 +165,11 @@ void CleanCache(agi::fs::path const& directory, std::string const& file_type, ui
+ 	queue->Async([=]{
+ 		LOG_D("utils/clean_cache") << "cleaning " << directory/file_type;
+ 		uint64_t total_size = 0;
+-		std::multimap<int64_t, agi::fs::path> cachefiles;
++		using cache_item = std::pair<int64_t, agi::fs::path>;
++		std::vector<cache_item> cachefiles;
+ 		for (auto const& file : agi::fs::DirectoryIterator(directory, file_type)) {
+ 			agi::fs::path path = directory/file;
+-			cachefiles.insert({agi::fs::ModifiedTime(path), path});
++			cachefiles.push_back({agi::fs::ModifiedTime(path), path});
+ 			total_size += agi::fs::Size(path);
+ 		}
+ 
+@@ -178,6 +179,10 @@ void CleanCache(agi::fs::path const& directory, std::string const& file_type, ui
+ 			return;
+ 		}
+ 
++		sort(begin(cachefiles), end(cachefiles), [](cache_item const& a, cache_item const& b) {
++			return a.first < b.first;
++		});
++
+ 		int deleted = 0;
+ 		for (auto const& i : cachefiles) {
+ 			// stop cleaning?
+
