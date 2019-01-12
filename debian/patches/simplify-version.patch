@@ -87,3 +87,4 @@ Index: aegisub/build/version.sh
 -</Project>
 -EOF
 +export BUILD_GIT_VERSION_STRING=$(dpkg-parsechangelog --show-field Version | cut -f1 -d"+")
++echo "#define BUILD_GIT_VERSION_STRING \"$BUILD_GIT_VERSION_STRING\"" > build/git_version.h
