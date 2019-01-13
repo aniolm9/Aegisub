@@ -6,7 +6,7 @@ Index: aegisub/build/version.sh
 ===================================================================
 --- aegisub/build.orig/version.sh
 +++ aegisub/build/version.sh
-@@ -1,79 +1 @@
+@@ -1,79 +1,2 @@
 -srcdir="$1"
 -
 -# If no git repo try to read from the existing git_version.h, for building from tarballs
